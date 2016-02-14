@@ -22,7 +22,7 @@ test_requirements = [
 
 setup(
     name='mazetool',
-    version='0.4.0',
+    version='0.5.0',
     description="A simple maze tool for managing 2D mazes using a cli.",
     long_description=readme + '\n\n' + history,
     author="Parth Kolekar",
