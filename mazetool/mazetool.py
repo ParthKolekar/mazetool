@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 
+"""
+    Generates a maze.
+    Allows a cli tool for ease of editing maze.
+    Upon saving the maze, it stores it in the current directory
+    as a series of files.
+"""
+
 from __future__ import print_function
 
 from functools import reduce
-from random import randint
 from sys import exit, setrecursionlimit
 
 setrecursionlimit(10000)
@@ -16,6 +22,9 @@ except ImportError:
     from tty import setraw
 
     def getch():
+        """
+            A getch for Linux Systems.
+        """
         file_descriptor = stdin.fileno()
         old_settings = tcgetattr(file_descriptor)
         try:
@@ -25,7 +34,11 @@ except ImportError:
             tcsetattr(file_descriptor, TCSADRAIN, old_settings)
         return character
 
+
 class GameMaze(object):
+    """
+        A GameMaze class which creates a maze.
+    """
     MAZE = dict(
         goal='G',
         bomb='B',
@@ -40,7 +53,10 @@ class GameMaze(object):
         END='\033[0m',
     )
 
-    def __init__(self, randomMaze=False, size=(70, 40)):
+    def __init__(self, size=(70, 40)):
+        """
+            Creates a GameMaze of size given.
+        """
         object.__init__(self)
         self.size_x = size[0]
         self.size_y = size[1]
@@ -53,32 +69,67 @@ class GameMaze(object):
                 self.game_maze[j][i] = GameMaze.MAZE['bomb']
 
     def set_attribute(self, game_point, attribute):
+        """
+            Sets the value on gamepoint to attribute.
+        """
         self.game_maze[game_point[1]][game_point[0]] = attribute
 
     def get_attribute(self, game_point):
+        """
+            Returns the value on gamepoint.
+        """
         return self.game_maze[game_point[1]][game_point[0]]
 
     def clear_all(self, game_point):
+        """
+            Resets the value on gamepoint to nothing.
+        """
         self.set_attribute(game_point, GameMaze.MAZE['nothing'])
 
     def __str__(self):
+        """
+            Performs a string representation of the maze.
+        """
         string = ''
         for i in self.game_maze:
             for j in i:
                 if j == GameMaze.MAZE['goal']:
-                    string += GameMaze.COLORS['goal'] + j + GameMaze.COLORS['END'] + ' '
+                    string += "".join([
+                        GameMaze.COLORS['goal'],
+                        j,
+                        GameMaze.COLORS['END'],
+                        ' '
+                    ])
                 elif j == GameMaze.MAZE['player']:
-                    string += GameMaze.COLORS['player'] + j + GameMaze.COLORS['END'] + ' '
+                    string += "".join([
+                        GameMaze.COLORS['player'],
+                        j,
+                        GameMaze.COLORS['END'],
+                        ' '
+                    ])
                 elif j == GameMaze.MAZE['bomb']:
-                    string += GameMaze.COLORS['bomb'] + j + GameMaze.COLORS['END'] + ' '
+                    string += "".join([
+                        GameMaze.COLORS['bomb'],
+                        j,
+                        GameMaze.COLORS['END'],
+                        ' '
+                    ])
                 elif j == GameMaze.MAZE['nothing']:
-                    string += GameMaze.COLORS['nothing'] + j + GameMaze.COLORS['END'] + ' '
+                    string += "".join([
+                        GameMaze.COLORS['nothing'],
+                        j,
+                        GameMaze.COLORS['END'],
+                        ' '
+                    ])
                 else:
                     string += j + ' '
             string += '\n'
         return string
 
     def count_attribute(self, attribute):
+        """
+            Returns the count of number of attribute in maze.
+        """
         count = 0
         for i in range(0, self.size_x):
             for j in range(0, self.size_y):
@@ -87,9 +138,12 @@ class GameMaze(object):
         return count
 
     def load(self):
+        """
+            Loads a maze from the current directory.
+        """
         for i in range(0, self.size_x):
             for j in range(0, self.size_y):
-                with open(",".join(map(str,[i, j]))) as f:
+                with open(",".join(map(str, [i, j]))) as f:
                     data = f.read()
                     if data in ['B', 'G']:
                         self.set_attribute((i, j), data)
@@ -97,6 +151,9 @@ class GameMaze(object):
                         self.set_attribute((i, j), '.')
 
     def dump(self):
+        """
+            Dumps a maze to the current directory.
+        """
         goals = []
         for i in range(0, self.size_x):
             for j in range(0, self.size_y):
@@ -106,17 +163,24 @@ class GameMaze(object):
             raise Exception('No Goals Found. Need atleast one Goal.')
         for i in range(0, self.size_x):
             for j in range(0, self.size_y):
-                with open(",".join(map(str,[i, j])), 'w') as f:
+                with open(",".join(map(str, [i, j])), 'w') as f:
                     attribute = self.get_attribute((i, j))
                     if attribute in ['B', 'G']:
                         f.write(attribute)
                     else:
-                        sum = reduce(lambda x, y: x + y, [(((((i - x[0]) ** 2) + (j - x[1]) ** 2)) ** 0.5) for x in goals])
+                        sum = reduce(
+                            lambda x, y: x + y,
+                            [(((((i - x[0]) ** 2) + (j - x[1]) ** 2)) ** 0.5) for x in goals]
+                        )
                         f.write(str(sum))
 
     __repr__ = __str__
 
-if __name__ == "__main__":
+
+def main():
+    """
+        Main Function.
+    """
     maze = GameMaze()
     try:
         maze.load()
@@ -146,3 +210,6 @@ if __name__ == "__main__":
         if character == 'd':
             position[0] = position[0] + 1
         maze.set_attribute(position, place_tile)
+
+if __name__ == "__main__":
+    main()
