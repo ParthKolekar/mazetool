@@ -138,7 +138,10 @@ class GameMaze(object):
         for i in range(range_x[0], range_x[1]):
             for j in range(range_y[0], range_y[1]):
                 if self.get_attribute((i, j)) == attribute:
-                    count = count + 1
+                    if i < 0 or j < 0:
+                        count += 0
+                    else:
+                        count = count + 1
         return count
 
     def load(self):
