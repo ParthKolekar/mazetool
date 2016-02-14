@@ -126,13 +126,17 @@ class GameMaze(object):
             string += '\n'
         return string
 
-    def count_attribute(self, attribute):
+    def count_attribute(self, attribute, range_x=None, range_y=None):
         """
             Returns the count of number of attribute in maze.
         """
         count = 0
-        for i in range(0, self.size_x):
-            for j in range(0, self.size_y):
+        if range_x == None:
+            range_x = (0, self.size_x)
+        if range_y == None:
+            range_y = (0, self.size_y)
+        for i in range(range_x[0], range_x[1]):
+            for j in range(range_y[0], range_y[1]):
                 if self.get_attribute((i, j)) == attribute:
                     count = count + 1
         return count
